@@ -19,10 +19,11 @@
         </dependency>
 
         <!-- JPA + Hibernate -->
+       
         <dependency>
             <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-entitymanager</artifactId>
-            <version>5.4.0.Final</version>
+            <artifactId>hibernate-core</artifactId>
+            <version>5.4.32.Final</version>
         </dependency>
 
         <!-- MySQL JDBC -->

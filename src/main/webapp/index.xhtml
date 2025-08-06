@@ -1,37 +1,42 @@
+
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:p="http://primefaces.org/ui">
-<h:head><title>Student CRUD</title></h:head>
+<h:head>
+    <title>Student CRUD</title>
+</h:head>
 <h:body>
 
 <h:form id="form">
     <p:panel header="Student Form">
-        <p:messages autoUpdate="true" />
+        <!-- Messages with explicit ID and p:autoUpdate -->
+        <p:messages id="messagesId" />
+        <p:autoUpdate target="messagesId" />
 
         <h:panelGrid columns="2" cellpadding="5">
             <h:outputText value="Name:"/>
-            <p:inputText value="#{studentBean.student.name}" required="true"/>
+            <p:inputText value="#{studentBean.student.name}" required="true" requiredMessage="Name is required"/>
 
             <h:outputText value="Address:"/>
-            <p:inputText value="#{studentBean.student.address}" required="true"/>
+            <p:inputText value="#{studentBean.student.address}" required="true" requiredMessage="Address is required"/>
 
             <h:outputText value="Class:"/>
-            <p:selectOneMenu value="#{studentBean.student.studentClass}" onchange="submit()">
-                <f:selectItem itemLabel="Select Class" itemValue="" />
+            <p:selectOneMenu value="#{studentBean.student.studentClass}" required="true" requiredMessage="Class is required" onchange="submit()">
+                <f:selectItem itemLabel="Select Class" itemValue="" noSelectionOption="true" />
                 <f:selectItems value="#{studentBean.classes}" />
                 <f:ajax listener="#{studentBean.onClassChange}" render="@form" />
             </p:selectOneMenu>
 
             <h:outputText value="Subject:"/>
-            <p:selectOneMenu value="#{studentBean.student.subject}">
-                <f:selectItem itemLabel="Select Subject" itemValue="" />
+            <p:selectOneMenu value="#{studentBean.student.subject}" required="true" requiredMessage="Subject is required">
+                <f:selectItem itemLabel="Select Subject" itemValue="" noSelectionOption="true" />
                 <f:selectItems value="#{studentBean.subjects}" />
             </p:selectOneMenu>
         </h:panelGrid>
 
-        <p:commandButton value="Save" action="#{studentBean.saveStudent}" update="form" />
+        <p:commandButton value="Save" action="#{studentBean.saveStudent}" update="form" process="@form" />
     </p:panel>
 
     <p:dataTable value="#{studentBean.students}" var="s" style="margin-top:20px;">
@@ -43,30 +48,41 @@
             <p:commandButton icon="pi pi-pencil" oncomplete="PF('dlg').show()" update="editForm">
                 <f:setPropertyActionListener value="#{s}" target="#{studentBean.selectedStudent}" />
             </p:commandButton>
-            <p:commandButton icon="pi pi-trash" action="#{studentBean.deleteStudent(s)}" update="form"/>
+            <p:commandButton icon="pi pi-trash" action="#{studentBean.deleteStudent(s)}" update="form" process="@this"/>
         </p:column>
     </p:dataTable>
 </h:form>
 
-<p:dialog header="Edit Student" widgetVar="dlg" modal="true">
+<p:dialog header="Edit Student" widgetVar="dlg" modal="true" resizable="false">
     <h:form id="editForm">
-        <h:panelGrid columns="2">
+
+<h:inputHidden value="#{studentBean.selectedStudent.id}" />
+        <h:panelGrid columns="2" cellpadding="5">
             <h:outputText value="Name:"/>
-            <p:inputText value="#{studentBean.selectedStudent.name}"/>
+            <p:inputText value="#{studentBean.selectedStudent.name}" required="true" requiredMessage="Name is required"/>
 
             <h:outputText value="Address:"/>
-            <p:inputText value="#{studentBean.selectedStudent.address}"/>
+            <p:inputText value="#{studentBean.selectedStudent.address}" required="true" requiredMessage="Address is required"/>
 
             <h:outputText value="Class:"/>
-            <p:inputText value="#{studentBean.selectedStudent.studentClass}"/>
+            <p:selectOneMenu value="#{studentBean.selectedStudent.studentClass}" required="true" requiredMessage="Class is required">
+                <f:selectItem itemLabel="Select Class" itemValue="" noSelectionOption="true" />
+                <f:selectItems value="#{studentBean.classes}" />
+                <f:ajax listener="#{studentBean.onClassChangeEdit}" render="subjectEdit" />
+            </p:selectOneMenu>
 
             <h:outputText value="Subject:"/>
-            <p:inputText value="#{studentBean.selectedStudent.subject}"/>
+            <p:selectOneMenu id="subjectEdit" value="#{studentBean.selectedStudent.subject}" required="true" requiredMessage="Subject is required">
+                <f:selectItem itemLabel="Select Subject" itemValue="" noSelectionOption="true" />
+                <f:selectItems value="#{studentBean.editSubjects}" />
+            </p:selectOneMenu>
         </h:panelGrid>
+            
 
-        <p:commandButton value="Update" action="#{studentBean.updateStudent}" 
-                         update=":form" oncomplete="PF('dlg').hide()" />
-    </h:form>
+
+<p:commandButton value="Update" action="#{studentBean.updateStudent}" 
+                 update=":form" process="@form" oncomplete="PF('dlg').hide()" />
+           </h:form>
 </p:dialog>
 
 </h:body>

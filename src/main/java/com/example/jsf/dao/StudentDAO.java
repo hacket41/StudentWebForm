@@ -16,13 +16,25 @@ public class StudentDAO {
         em.close();
     }
 
+   
     public void update(Student student) {
         EntityManager em = JpaUtil.getEntityManager();
         em.getTransaction().begin();
-        em.merge(student);
-        em.getTransaction().commit();
-        em.close();
+
+    Student managedStudent = em.find(Student.class, student.getId());
+    if (managedStudent != null) {
+        managedStudent.setName(student.getName());
+        managedStudent.setAddress(student.getAddress());
+        managedStudent.setStudentClass(student.getStudentClass());
+        managedStudent.setSubject(student.getSubject());
+    } else {
+        // In case student not found, you could throw exception or save as new
+        em.persist(student);
     }
+
+    em.getTransaction().commit();
+    em.close();
+}
 
     public void delete(Student student) {
         EntityManager em = JpaUtil.getEntityManager();

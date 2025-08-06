@@ -22,7 +22,8 @@ public class StudentBean implements Serializable {
 
     private List<String> classes;
     private Map<String, List<String>> classSubjectsMap;
-    private List<String> subjects;
+    private List<String> subjects;        // for add form
+    private List<String> editSubjects;    // for edit dialog
 
     private final StudentDAO studentDAO = new StudentDAO();
 
@@ -35,29 +36,76 @@ public class StudentBean implements Serializable {
 
         classes = new ArrayList<>(classSubjectsMap.keySet());
         subjects = new ArrayList<>();
+        editSubjects = new ArrayList<>();
 
         students = studentDAO.findAll();
+
+        selectedStudent = new Student(); // initialize to prevent null
+    }
+
+    public Student getSelectedStudent() {
+        if (selectedStudent == null) {
+            selectedStudent = new Student();
+        }
+        return selectedStudent;
+    }
+
+    public void setSelectedStudent(Student selectedStudent) {
+        this.selectedStudent = selectedStudent;
+        onClassChangeEdit();  // populate editSubjects immediately when set
     }
 
     public void onClassChange() {
-        subjects = student.getStudentClass() != null ? classSubjectsMap.get(student.getStudentClass()) : new ArrayList<>();
+        if (student.getStudentClass() != null) {
+            subjects = classSubjectsMap.get(student.getStudentClass());
+        } else {
+            subjects = new ArrayList<>();
+        }
+        student.setSubject(null);  // reset subject when class changes
+    }
+
+    public void onClassChangeEdit() {
+        if (selectedStudent != null && selectedStudent.getStudentClass() != null) {
+            editSubjects = classSubjectsMap.get(selectedStudent.getStudentClass());
+        } else {
+            editSubjects = new ArrayList<>();
+        }
+        if (selectedStudent != null) {
+            selectedStudent.setSubject(null);  // reset subject when class changes
+        }
     }
 
     public void saveStudent() {
         studentDAO.save(student);
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Student Saved"));
-        student = new Student();
         students = studentDAO.findAll();
+
+        student = new Student(); // reset form
+        student.setStudentClass(null);
+        student.setSubject(null);
+
+        subjects = new ArrayList<>();
     }
 
     public void updateStudent() {
+        if (selectedStudent == null) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No student selected to update", ""));
+            return;
+        }
+
         studentDAO.update(selectedStudent);
         students = studentDAO.findAll();
+
+        selectedStudent = new Student();  // reset selectedStudent after update
+        editSubjects = new ArrayList<>();
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Student updated successfully"));
     }
 
     public void deleteStudent(Student s) {
         studentDAO.delete(s);
         students = studentDAO.findAll();
+        if (selectedStudent != null && selectedStudent.equals(s)) {
+            selectedStudent = new Student();
+        }
     }
 
     // Getters and Setters
@@ -70,43 +118,23 @@ public class StudentBean implements Serializable {
         this.student = student;
     }
 
-    public Student getSelectedStudent() {
-        return selectedStudent;
-    }
-
-    public void setSelectedStudent(Student selectedStudent) {
-        this.selectedStudent = selectedStudent;
-    }
-
     public List<Student> getStudents() {
         return students;
-    }
-
-    public void setStudents(List<Student> students) {
-        this.students = students;
     }
 
     public List<String> getClasses() {
         return classes;
     }
 
-    public void setClasses(List<String> classes) {
-        this.classes = classes;
-    }
-
-    public Map<String, List<String>> getClassSubjectsMap() {
-        return classSubjectsMap;
-    }
-
-    public void setClassSubjectsMap(Map<String, List<String>> classSubjectsMap) {
-        this.classSubjectsMap = classSubjectsMap;
-    }
-
     public List<String> getSubjects() {
         return subjects;
     }
 
-    public void setSubjects(List<String> subjects) {
-        this.subjects = subjects;
+    public List<String> getEditSubjects() {
+        return editSubjects;
+    }
+
+    public Map<String, List<String>> getClassSubjectsMap() {
+        return classSubjectsMap;
     }
 }
