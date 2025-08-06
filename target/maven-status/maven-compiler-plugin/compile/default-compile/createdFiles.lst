@@ -1,0 +1,4 @@
+com/example/jsf/bean/StudentBean.class
+com/example/jsf/util/JpaUtil.class
+com/example/jsf/entity/Student.class
+com/example/jsf/dao/StudentDAO.class

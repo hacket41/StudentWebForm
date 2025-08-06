@@ -1,0 +1,4 @@
+/home/hacket41/student-crud-jsf/src/main/java/com/example/jsf/bean/StudentBean.java
+/home/hacket41/student-crud-jsf/src/main/java/com/example/jsf/dao/StudentDAO.java
+/home/hacket41/student-crud-jsf/src/main/java/com/example/jsf/entity/Student.java
+/home/hacket41/student-crud-jsf/src/main/java/com/example/jsf/util/JpaUtil.java
