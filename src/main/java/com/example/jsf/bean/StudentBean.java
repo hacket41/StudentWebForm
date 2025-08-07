@@ -1,4 +1,3 @@
-
 package com.example.jsf.bean;
 
 import com.example.jsf.dao.StudentDAO;

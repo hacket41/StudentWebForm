@@ -16,7 +16,7 @@ public class StudentDAO {
         em.close();
     }
 
-   
+
     public void update(Student student) {
         EntityManager em = JpaUtil.getEntityManager();
         em.getTransaction().begin();

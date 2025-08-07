@@ -1,4 +1,3 @@
-
 package com.example.jsf.util;
 
 import javax.persistence.EntityManager;
