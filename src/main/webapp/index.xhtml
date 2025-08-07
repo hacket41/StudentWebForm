@@ -53,10 +53,12 @@
     </p:dataTable>
 </h:form>
 
+
 <p:dialog header="Edit Student" widgetVar="dlg" modal="true" resizable="false">
     <h:form id="editForm">
 
-<h:inputHidden value="#{studentBean.selectedStudent.id}" />
+        <h:inputHidden id="hiddenId" value="#{studentBean.selectedStudent.id}" />
+
         <h:panelGrid columns="2" cellpadding="5">
             <h:outputText value="Name:"/>
             <p:inputText value="#{studentBean.selectedStudent.name}" required="true" requiredMessage="Name is required"/>
@@ -77,12 +79,13 @@
                 <f:selectItems value="#{studentBean.editSubjects}" />
             </p:selectOneMenu>
         </h:panelGrid>
-            
 
-
-<p:commandButton value="Update" action="#{studentBean.updateStudent}" 
-                 update=":form" process="@form" oncomplete="PF('dlg').hide()" />
-           </h:form>
+        <p:commandButton value="Update"
+                         action="#{studentBean.updateStudent}"
+                         update=":form"
+                         process="@form"
+                         oncomplete="PF('dlg').hide()" />
+    </h:form>
 </p:dialog>
 
 </h:body>

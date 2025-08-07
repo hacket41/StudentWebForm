@@ -17,7 +17,7 @@ import java.util.*;
 public class StudentBean implements Serializable {
 
     private Student student = new Student();
-    private Student selectedStudent;
+    private Student selectedStudent = new Student(); // Initialize here
     private List<Student> students;
 
     private List<String> classes;
@@ -39,39 +39,32 @@ public class StudentBean implements Serializable {
         editSubjects = new ArrayList<>();
 
         students = studentDAO.findAll();
-
-        selectedStudent = new Student(); // initialize to prevent null
     }
 
-    public Student getSelectedStudent() {
-        if (selectedStudent == null) {
-            selectedStudent = new Student();
-        }
-        return selectedStudent;
+    // Called when clicking edit button to load data into dialog form
+    public void prepareEdit(Student student) {
+        this.selectedStudent = student;
+        // Populate editSubjects based on student's class
+        this.editSubjects = classSubjectsMap.getOrDefault(student.getStudentClass(), new ArrayList<>());
     }
 
-    public void setSelectedStudent(Student selectedStudent) {
-        this.selectedStudent = selectedStudent;
-        onClassChangeEdit();  // populate editSubjects immediately when set
-    }
-
+    // For add form class change event
     public void onClassChange() {
         if (student.getStudentClass() != null) {
             subjects = classSubjectsMap.get(student.getStudentClass());
         } else {
             subjects = new ArrayList<>();
         }
-        student.setSubject(null);  // reset subject when class changes
+        student.setSubject(null); // reset subject
     }
 
-    public void onClassChangeEdit() {
+    // For edit form class change ajax event
+    public void loadSubjects() {
         if (selectedStudent != null && selectedStudent.getStudentClass() != null) {
-            editSubjects = classSubjectsMap.get(selectedStudent.getStudentClass());
+            editSubjects = classSubjectsMap.getOrDefault(selectedStudent.getStudentClass(), new ArrayList<>());
+            selectedStudent.setSubject(null); // reset subject when class changes
         } else {
             editSubjects = new ArrayList<>();
-        }
-        if (selectedStudent != null) {
-            selectedStudent.setSubject(null);  // reset subject when class changes
         }
     }
 
@@ -79,43 +72,49 @@ public class StudentBean implements Serializable {
         studentDAO.save(student);
         students = studentDAO.findAll();
 
-        student = new Student(); // reset form
-        student.setStudentClass(null);
-        student.setSubject(null);
-
+        student = new Student();
         subjects = new ArrayList<>();
     }
 
     public void updateStudent() {
         if (selectedStudent == null) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "No student selected to update", ""));
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_ERROR, "No student selected to update", ""));
             return;
         }
-
         studentDAO.update(selectedStudent);
         students = studentDAO.findAll();
 
-        selectedStudent = new Student();  // reset selectedStudent after update
+        selectedStudent = new Student();
         editSubjects = new ArrayList<>();
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Student updated successfully"));
+        FacesContext.getCurrentInstance().addMessage(null,
+            new FacesMessage("Student updated successfully"));
     }
 
     public void deleteStudent(Student s) {
         studentDAO.delete(s);
         students = studentDAO.findAll();
+
         if (selectedStudent != null && selectedStudent.equals(s)) {
             selectedStudent = new Student();
         }
     }
 
     // Getters and Setters
-
     public Student getStudent() {
         return student;
     }
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+
+    public Student getSelectedStudent() {
+        return selectedStudent;
+    }
+
+    public void setSelectedStudent(Student selectedStudent) {
+        this.selectedStudent = selectedStudent;
     }
 
     public List<Student> getStudents() {
@@ -132,9 +131,5 @@ public class StudentBean implements Serializable {
 
     public List<String> getEditSubjects() {
         return editSubjects;
-    }
-
-    public Map<String, List<String>> getClassSubjectsMap() {
-        return classSubjectsMap;
     }
 }
